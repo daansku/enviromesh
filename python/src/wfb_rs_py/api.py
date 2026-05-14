@@ -50,7 +50,7 @@ class Tx:
     def __init__(
         self,
         iface: str,
-        channel_id: int,
+        stream_id: int,
         *,
         frame_type: int = 0x08,
         mcs_index: int = 1,
@@ -66,7 +66,7 @@ class Tx:
 
         cfg = WfbTxConfig(
             iface=iface.encode("utf-8"),
-            channel_id=channel_id,
+            stream_id=stream_id,
             frame_type=frame_type,
             mcs_index=mcs_index,
             bandwidth=bandwidth,
@@ -129,7 +129,7 @@ class Rx:
     def __init__(
         self,
         iface: str,
-        channel_id: int,
+        stream_id: int,
         *,
         ignore_self_injected: bool = True,
         ring_size: int = 16,
@@ -144,7 +144,7 @@ class Rx:
 
         cfg = WfbRxConfig(
             iface=iface.encode("utf-8"),
-            channel_id=channel_id,
+            stream_id=stream_id,
             ignore_self_injected=1 if ignore_self_injected else 0,
             ring_size=ring_size,
         )

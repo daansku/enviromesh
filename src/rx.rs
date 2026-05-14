@@ -110,7 +110,7 @@ fn radiotap_meta_from_packet(pkt: &[u8]) -> Option<RadiotapMeta> {
     }
 
     // Mapping from radiotap field index -> (align,size) from vendor radiotap.c.
-    // Only include fields that might appear in v0 sender/receiver paths.
+    // Only include fields that might appear in sender/receiver paths.
     fn field_layout(field: u32) -> Option<(usize, usize)> {
         match field {
             RTAP_TSFT => Some((8, 8)),
@@ -204,7 +204,7 @@ fn radiotap_meta_from_packet(pkt: &[u8]) -> Option<RadiotapMeta> {
                 rt_flags = field_bytes[0];
             }
             RTAP_TX_FLAGS => {
-                // v0 receiver treats TX_FLAGS presence as self-injected.
+                // Receiver treats TX_FLAGS presence as self-injected.
                 self_injected = true;
             }
             RTAP_MCS => {
@@ -260,9 +260,9 @@ impl WfbRx {
         if cfg.iface.is_empty() {
             return Err(WfbError::InvalidArgument("iface is empty".into()));
         }
-        if cfg.channel_id == 0 {
+        if cfg.stream_id == 0 {
             return Err(WfbError::InvalidArgument(
-                "channel_id=0 is disallowed in WFB-rs".into(),
+                "stream_id=0 is disallowed".into(),
             ));
         }
 
@@ -290,10 +290,10 @@ impl WfbRx {
             .setnonblock()
             .map_err(|e| WfbError::Pcap(e.to_string()))?;
 
-        // Install the same channel_id filter used by the C++ receiver.
+        // Install the same stream_id filter used by the C++ receiver.
         let filter_exp = format!(
             "ether[0x0a:2]==0x5742 && ether[0x0c:4] == 0x{:08x}",
-            cfg.channel_id
+            cfg.stream_id
         );
 
         let mut cap = cap;

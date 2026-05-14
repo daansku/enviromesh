@@ -8,13 +8,13 @@ from wfb_rs_py._ffi import WfbRxConfig, WfbRxMeta, WfbTxConfig
 
 def test_tx_config_layout():
     assert WfbTxConfig.iface.offset == 0
-    assert WfbTxConfig.channel_id.offset >= ctypes.sizeof(ctypes.c_void_p)
-    assert WfbTxConfig.frame_type.offset > WfbTxConfig.channel_id.offset
+    assert WfbTxConfig.stream_id.offset >= ctypes.sizeof(ctypes.c_void_p)
+    assert WfbTxConfig.frame_type.offset > WfbTxConfig.stream_id.offset
 
 
 def test_rx_config_layout():
     assert WfbRxConfig.iface.offset == 0
-    assert WfbRxConfig.channel_id.offset >= ctypes.sizeof(ctypes.c_void_p)
+    assert WfbRxConfig.stream_id.offset >= ctypes.sizeof(ctypes.c_void_p)
     assert WfbRxConfig.ring_size.offset > WfbRxConfig.ignore_self_injected.offset
 
 

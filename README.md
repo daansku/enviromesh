@@ -2,7 +2,7 @@
 
 Rust-only plaintext framing implementation:
 
-- synthetic IEEE802.11 header injection (channel-id embedded in addr2/addr3)
+- synthetic IEEE802.11 header injection (stream-id embedded in addr2/addr3)
 - HT radiotap TX header template
 - pcap capture + radiotap parsing (metadata best-effort)
 - plaintext payload framing (`WFB_PROTO_VERSION = 0`)
@@ -12,9 +12,9 @@ Rust-only plaintext framing implementation:
 Two different "channel" concepts, do not confuse:
 
 - **Wifi channel** — physical RF channel (e.g. `36`, `52`). Set on the NIC out-of-band with `iw dev … set channel`. wfb_rs does not touch it.
-- **`channel_id`** — a 32-bit logical demux tag baked into the synthetic 802.11 addr2/addr3 MACs as `57:42:<channel_id big-endian>`. Lets multiple independent wfb streams share the same RF channel; RX drops frames whose embedded `channel_id` does not match. Naming inherited from upstream `wfb-ng` — think of it as "stream id".
+- **`stream_id`** — a 32-bit logical demux tag baked into the synthetic 802.11 addr2/addr3 MACs as `57:42:<stream_id big-endian>`. Lets multiple independent wfb streams share the same RF channel; RX drops frames whose embedded `stream_id` does not match.
 
-Two peers must agree on **both** the wifi channel and the `channel_id` to exchange traffic.
+Two peers must agree on **both** the wifi channel and the `stream_id` to exchange traffic.
 
 ## Runtime prerequisites
 
@@ -80,11 +80,11 @@ The two example invocation styles are equivalent — pick one:
 
 ### `simple_txrx` — interactive stdin chat
 
-Both TX and RX on a single interface. Frames it injects itself are filtered out of its RX (`ignore_self_injected: true`), so to see anything received you need a **second peer** running the same example on the same wifi channel and `channel_id`.
+Both TX and RX on a single interface. Frames it injects itself are filtered out of its RX (`ignore_self_injected: true`), so to see anything received you need a **second peer** running the same example on the same wifi channel and `stream_id`.
 
 On each peer:
 ```bash
-sudo ./target/debug/examples/simple_txrx --iface "$NIC" --channel-id 1
+sudo ./target/debug/examples/simple_txrx --iface "$NIC" --stream-id 1
 ```
 
 Then type a line on peer A's stdin — it appears as `RX seq=… payload="…"` on peer B.
@@ -102,13 +102,13 @@ Separate `--role tx` and `--role rx` processes on two peers. The TX side generat
 Receiver:
 
 ```bash
-sudo ./target/debug/examples/bandwidth --role rx --iface "$NIC" --channel-id 1
+sudo ./target/debug/examples/bandwidth --role rx --iface "$NIC" --stream-id 1
 ```
 
 Sender:
 
 ```bash
-sudo ./target/debug/examples/bandwidth --role tx --iface "$NIC" --channel-id 1
+sudo ./target/debug/examples/bandwidth --role tx --iface "$NIC" --stream-id 1
 ```
 
 Useful knobs:
@@ -119,13 +119,13 @@ Useful knobs:
 
 ## Sniffing wfb_rs traffic with tcpdump
 
-wfb_rs-injected frames carry a fixed addr2/addr3 of `57:42:<channel_id big-endian>`. For `--channel-id 1` that's `57:42:00:00:00:01`:
+wfb_rs-injected frames carry a fixed addr2/addr3 of `57:42:<stream_id big-endian>`. For `--stream-id 1` that's `57:42:00:00:00:01`:
 
 ```bash
 sudo tcpdump -i "$NIC" -y IEEE802_11_RADIO -nn -e -vvv 'wlan addr2 57:42:00:00:00:01'
 ```
 
-To see all wfb_rs traffic regardless of `channel_id`, drop the filter and grep visually for addr2 starting `57:42:` — tcpdump's BPF for `wlan[N:M]` indexing on radiotap captures is not reliable across versions.
+To see all wfb_rs traffic regardless of `stream_id`, drop the filter and grep visually for addr2 starting `57:42:` — tcpdump's BPF for `wlan[N:M]` indexing on radiotap captures is not reliable across versions.
 
 ```bash
 sudo tcpdump -y IEEE802_11_RADIO -nn -e -vvv 'wlan[10:2] = 0x5742'
@@ -190,10 +190,10 @@ Usage:
 ```python
 from wfb_rs_py import Tx, Rx
 
-with Tx(iface="wlan0", channel_id=1) as tx:
+with Tx(iface="wlan0", stream_id=1) as tx:
     tx.send(b"hello", seq=1)
 
-with Rx(iface="wlan0", channel_id=1) as rx:
+with Rx(iface="wlan0", stream_id=1) as rx:
     maybe_frame = rx.recv_optional(timeout_ms=100)
     if maybe_frame is not None:
         payload, meta = maybe_frame

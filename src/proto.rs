@@ -35,7 +35,7 @@ pub type Result<T> = std::result::Result<T, WfbError>;
 #[derive(Debug, Clone)]
 pub struct WfbTxConfig {
     pub iface: String,
-    pub channel_id: u32,
+    pub stream_id: u32,
     pub frame_type: u8, // WFB_FRAME_TYPE_DATA or _RTS
     pub mcs_index: u8,
     pub bandwidth: u8, // 20 or 40
@@ -44,7 +44,7 @@ pub struct WfbTxConfig {
 #[derive(Debug, Clone)]
 pub struct WfbRxConfig {
     pub iface: String,
-    pub channel_id: u32,
+    pub stream_id: u32,
     pub rcv_buf_size: Option<i32>,
     pub ignore_self_injected: bool,
     pub ring_size: usize,

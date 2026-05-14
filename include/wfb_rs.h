@@ -22,7 +22,7 @@ typedef struct wfb_rx_handle wfb_rx_handle;
 
 typedef struct wfb_tx_config {
   const char *iface;
-  uint32_t channel_id;
+  uint32_t stream_id;
   uint8_t frame_type;
   uint8_t mcs_index;
   uint8_t bandwidth;
@@ -30,7 +30,7 @@ typedef struct wfb_tx_config {
 
 typedef struct wfb_rx_config {
   const char *iface;
-  uint32_t channel_id;
+  uint32_t stream_id;
   uint8_t ignore_self_injected;
   uint32_t ring_size;
 } wfb_rx_config;

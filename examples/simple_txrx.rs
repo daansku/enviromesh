@@ -45,11 +45,11 @@ struct Args {
 
     #[arg(
         short = 'c',
-        long = "channel-id",
-        help = "WFB channel_id to embed in synthetic headers (hex supported, e.g. 0x1234)",
+        long = "stream-id",
+        help = "WFB stream_id to embed in synthetic headers (hex supported, e.g. 0x1234)",
         value_parser = parse_u32
     )]
-    channel_id: u32,
+    stream_id: u32,
 
     #[arg(
         short = 'm',
@@ -66,13 +66,13 @@ struct Args {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
-    if args.channel_id == 0 {
-        return Err("channel-id must be non-zero (strict WFB-rs behavior)".into());
+    if args.stream_id == 0 {
+        return Err("stream-id must be non-zero (strict WFB-rs behavior)".into());
     }
 
     let tx_cfg = WfbTxConfig {
         iface: args.iface.clone(),
-        channel_id: args.channel_id,
+        stream_id: args.stream_id,
         frame_type: args.mode.frame_type(),
         mcs_index: 1,
         bandwidth: 40,
@@ -80,7 +80,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let rx_cfg = WfbRxConfig {
         iface: args.iface,
-        channel_id: args.channel_id,
+        stream_id: args.stream_id,
         rcv_buf_size: None,
         ignore_self_injected: true,
         ring_size: 16,

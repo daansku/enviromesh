@@ -33,7 +33,7 @@ pub struct wfb_rx_handle {
 #[allow(non_camel_case_types)]
 pub struct wfb_tx_config {
     pub iface: *const c_char,
-    pub channel_id: u32,
+    pub stream_id: u32,
     pub frame_type: u8,
     pub mcs_index: u8,
     pub bandwidth: u8,
@@ -43,7 +43,7 @@ pub struct wfb_tx_config {
 #[allow(non_camel_case_types)]
 pub struct wfb_rx_config {
     pub iface: *const c_char,
-    pub channel_id: u32,
+    pub stream_id: u32,
     pub ignore_self_injected: u8,
     pub ring_size: u32,
 }
@@ -132,7 +132,7 @@ pub extern "C" fn wfb_tx_open(cfg: *const wfb_tx_config, out_handle: *mut *mut w
         };
         let rust_cfg = WfbTxConfig {
             iface,
-            channel_id: cfg.channel_id,
+            stream_id: cfg.stream_id,
             frame_type: cfg.frame_type,
             mcs_index: cfg.mcs_index,
             bandwidth: cfg.bandwidth,
@@ -206,7 +206,7 @@ pub extern "C" fn wfb_rx_open(cfg: *const wfb_rx_config, out_handle: *mut *mut w
         };
         let rust_cfg = WfbRxConfig {
             iface,
-            channel_id: cfg.channel_id,
+            stream_id: cfg.stream_id,
             rcv_buf_size: None,
             ignore_self_injected: cfg.ignore_self_injected != 0,
             ring_size: cfg.ring_size as usize,

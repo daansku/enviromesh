@@ -30,10 +30,10 @@ pip install -e .
 ```python
 from wfb_rs_py import Tx, Rx
 
-with Tx(iface="wlan0", channel_id=1) as tx:
+with Tx(iface="wlan0", stream_id=1) as tx:
     tx.send(b"hello", seq=1)
 
-with Rx(iface="wlan0", channel_id=1) as rx:
+with Rx(iface="wlan0", stream_id=1) as rx:
     result = rx.recv_optional(timeout_ms=100)
     if result is not None:
         payload, meta = result
@@ -43,8 +43,8 @@ with Rx(iface="wlan0", channel_id=1) as rx:
 Runnable example script:
 
 ```bash
-python examples/simple_txrx.py --role tx --iface $NIC --channel-id 1
-python examples/simple_txrx.py --role rx --iface $NIC --channel-id 1
+python examples/simple_txrx.py --role tx --iface $NIC --stream-id 1
+python examples/simple_txrx.py --role rx --iface $NIC --stream-id 1
 ```
 
 ## Tests

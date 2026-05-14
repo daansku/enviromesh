@@ -68,7 +68,7 @@ def raise_for_code(code: int, fn_name: str) -> None:
 class WfbTxConfig(ctypes.Structure):
     _fields_ = [
         ("iface", ctypes.c_char_p),
-        ("channel_id", ctypes.c_uint32),
+        ("stream_id", ctypes.c_uint32),
         ("frame_type", ctypes.c_uint8),
         ("mcs_index", ctypes.c_uint8),
         ("bandwidth", ctypes.c_uint8),
@@ -78,7 +78,7 @@ class WfbTxConfig(ctypes.Structure):
 class WfbRxConfig(ctypes.Structure):
     _fields_ = [
         ("iface", ctypes.c_char_p),
-        ("channel_id", ctypes.c_uint32),
+        ("stream_id", ctypes.c_uint32),
         ("ignore_self_injected", ctypes.c_uint8),
         ("ring_size", ctypes.c_uint32),
     ]

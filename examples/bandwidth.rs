@@ -47,8 +47,8 @@ struct Args {
     #[arg(short = 'i', long = "iface")]
     iface: String,
 
-    #[arg(short = 'c', long = "channel-id", value_parser = parse_u32)]
-    channel_id: u32,
+    #[arg(short = 'c', long = "stream-id", value_parser = parse_u32)]
+    stream_id: u32,
 
     #[arg(long = "frame-mode", value_enum, default_value_t = FrameMode::Data)]
     frame_mode: FrameMode,
@@ -79,7 +79,7 @@ fn report_line(prefix: &str, bytes: u64, packets: u64, dt: Duration) {
 fn run_tx(args: &Args) -> Result<(), Box<dyn std::error::Error>> {
     let cfg = WfbTxConfig {
         iface: args.iface.clone(),
-        channel_id: args.channel_id,
+        stream_id: args.stream_id,
         frame_type: args.frame_mode.frame_type(),
         mcs_index: 7,
         bandwidth: 20,
@@ -125,7 +125,7 @@ fn run_tx(args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 fn run_rx(args: &Args) -> Result<(), Box<dyn std::error::Error>> {
     let cfg = WfbRxConfig {
         iface: args.iface.clone(),
-        channel_id: args.channel_id,
+        stream_id: args.stream_id,
         rcv_buf_size: None,
         ignore_self_injected: true,
         ring_size: 256,
@@ -165,8 +165,8 @@ fn run_rx(args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
-    if args.channel_id == 0 {
-        return Err("channel-id must be non-zero".into());
+    if args.stream_id == 0 {
+        return Err("stream-id must be non-zero".into());
     }
 
     match args.role {

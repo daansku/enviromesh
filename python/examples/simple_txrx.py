@@ -8,9 +8,9 @@ from typing import Optional
 from wfb_rs_py import Rx, Tx
 
 
-def run_tx(iface: str, channel_id: int, interval_ms: int) -> int:
+def run_tx(iface: str, stream_id: int, interval_ms: int) -> int:
     seq = 1
-    with Tx(iface=iface, channel_id=channel_id) as tx:
+    with Tx(iface=iface, stream_id=stream_id) as tx:
         print("TX mode: enter lines to send, Ctrl-D to exit")
         for line in sys.stdin:
             payload = line.rstrip("\n").encode("utf-8")
@@ -24,8 +24,8 @@ def run_tx(iface: str, channel_id: int, interval_ms: int) -> int:
     return 0
 
 
-def run_rx(iface: str, channel_id: int, timeout_ms: int) -> int:
-    with Rx(iface=iface, channel_id=channel_id) as rx:
+def run_rx(iface: str, stream_id: int, timeout_ms: int) -> int:
+    with Rx(iface=iface, stream_id=stream_id) as rx:
         print("RX mode: waiting for frames, Ctrl-C to exit")
         while True:
             result: Optional[tuple[bytes, object]] = rx.recv_optional(timeout_ms=timeout_ms)
@@ -45,7 +45,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Simple wfb_rs_py TX/RX example")
     parser.add_argument("--role", choices=["tx", "rx"], required=True)
     parser.add_argument("--iface", required=True, help="monitor-mode interface")
-    parser.add_argument("--channel-id", type=int, required=True, help="channel id (u32)")
+    parser.add_argument("--stream-id", type=int, required=True, help="stream id (u32)")
     parser.add_argument(
         "--timeout-ms",
         type=int,
@@ -61,8 +61,8 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.role == "tx":
-        return run_tx(args.iface, args.channel_id, args.tx_interval_ms)
-    return run_rx(args.iface, args.channel_id, args.timeout_ms)
+        return run_tx(args.iface, args.stream_id, args.tx_interval_ms)
+    return run_rx(args.iface, args.stream_id, args.timeout_ms)
 
 
 if __name__ == "__main__":

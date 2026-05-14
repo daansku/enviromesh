@@ -28,13 +28,13 @@ const MCS_IDX_OFF: usize = 12;
 const MCS_BW_20: u8 = 0;
 const MCS_BW_40: u8 = 1;
 
-/// Synthetic IEEE802.11 header template (24 bytes), patched for channel_id + seq.
+/// Synthetic IEEE802.11 header template (24 bytes), patched for stream_id + seq.
 const IEEE80211_HEADER_LEN: usize = 24;
 const IEEE80211_HEADER_TEMPLATE: [u8; IEEE80211_HEADER_LEN] = [
     0x08, 0x01, 0x00, 0x00, // frame control + duration
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // receiver is broadcast
-    0x57, 0x42, 0xaa, 0xbb, 0xcc, 0xdd, // dst MAC (channel_id replaces last 4 bytes)
-    0x57, 0x42, 0xaa, 0xbb, 0xcc, 0xdd, // src MAC (channel_id replaces last 4 bytes)
+    0x57, 0x42, 0xaa, 0xbb, 0xcc, 0xdd, // dst MAC (stream_id replaces last 4 bytes)
+    0x57, 0x42, 0xaa, 0xbb, 0xcc, 0xdd, // src MAC (stream_id replaces last 4 bytes)
     0x00, 0x00, // (seq_num << 4) + fragment_num (patched per send)
 ];
 
@@ -47,7 +47,7 @@ const FRAME_SEQ_HB: usize = 23;
 pub struct WfbTx {
     fd: c_int,
 
-    channel_id: u32,
+    stream_id: u32,
     frame_type: u8,
 
     ieee80211_seq: u16,
@@ -150,9 +150,9 @@ impl WfbTx {
         if cfg.iface.is_empty() {
             return Err(WfbError::InvalidArgument("iface is empty".into()));
         }
-        if cfg.channel_id == 0 {
+        if cfg.stream_id == 0 {
             return Err(WfbError::InvalidArgument(
-                "channel_id=0 is disallowed in v0".into(),
+                "stream_id=0 is disallowed".into(),
             ));
         }
         if cfg.frame_type != WFB_FRAME_TYPE_DATA && cfg.frame_type != WFB_FRAME_TYPE_RTS {
@@ -175,7 +175,7 @@ impl WfbTx {
 
         let mut tx = Self {
             fd,
-            channel_id: cfg.channel_id,
+            stream_id: cfg.stream_id,
             frame_type: cfg.frame_type,
             ieee80211_seq: 0,
             ieee_hdr: IEEE80211_HEADER_TEMPLATE,
@@ -185,10 +185,10 @@ impl WfbTx {
         // Patch frame control (matches intended behavior from wifibroadcast.hpp constants).
         tx.ieee_hdr[0] = tx.frame_type;
 
-        // Patch channel_id into synthetic MAC addresses.
-        let channel_id_be = tx.channel_id.to_be_bytes();
-        tx.ieee_hdr[SRC_MAC_THIRD_BYTE..SRC_MAC_THIRD_BYTE + 4].copy_from_slice(&channel_id_be);
-        tx.ieee_hdr[DST_MAC_THIRD_BYTE..DST_MAC_THIRD_BYTE + 4].copy_from_slice(&channel_id_be);
+        // Patch stream_id into synthetic MAC addresses.
+        let stream_id_be = tx.stream_id.to_be_bytes();
+        tx.ieee_hdr[SRC_MAC_THIRD_BYTE..SRC_MAC_THIRD_BYTE + 4].copy_from_slice(&stream_id_be);
+        tx.ieee_hdr[DST_MAC_THIRD_BYTE..DST_MAC_THIRD_BYTE + 4].copy_from_slice(&stream_id_be);
 
         tx.build_radiotap_ht(mcs_index, bandwidth)?;
 
