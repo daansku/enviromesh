@@ -21,6 +21,11 @@ target
 #.idea/
 
 python/src/wfb_rs_py.egg-info/
+python/.venv/
+**/.pytest_cache/
+**/__pycache__/
+**/.coverage
+**/.coverage.*
 
 examples_c/*
 !examples_c/*.*
