@@ -144,18 +144,18 @@ Demonstrates A -> B -> C relay setup where node B automatically bridges a physic
 Node C (Target Receiver):
 
 ```bash
-sudo ./target/debug/examples/mesh_node --iface "$NIC" --node-id 3
+sudo ./target/debug/examples/mesh_node_img --iface "$NIC" --node-id 3
 ```
 
 Node B (The relay):
 
 ```bash
-sudo ./target/debug/examples/mesh_node --iface "$NIC" --node-id 2
+sudo ./target/debug/examples/mesh_node_img --iface "$NIC" --node-id 2
 ```
 
 Node A (The Sender):
 ```bash
-sudo ./target/debug/examples/mesh_node --iface "$NIC" --node-id 1 --dest-id 3 --file test_image.jpg
+sudo ./target/debug/examples/mesh_node_img --iface "$NIC" --node-id 1 --dest-id 3 --file test_image.jpg
 ```
 
 Node B will print "[*] RELAYING..." as it rebroadcasts the traffic. Node C will receive the chunks and tag the link status as [Relayed via 1 HOPS]
